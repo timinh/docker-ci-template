@@ -1,0 +1,98 @@
+version: '3.7'
+services:
+    # Image préparée pour symfony 6
+    example_app:
+        image: 'timinh/php8.1-apache:latest'
+        environment:
+            TZ: Europe/Paris
+            APP_ENV: dev
+            DATABASE_URL: 'sqlite:///%kernel.project_dir%/var/data.db'
+            # MAILER_DSN: 'smtp://null:null@maildev:1025'
+        container_name: example_app
+        volumes:
+            - ./apache/vhosts-dev.conf:/etc/apache2/sites-available/000-default.conf
+            - ./php/php.ini:/usr/local/etc/php/conf.d/app.ini
+            - ../:/var/www/html:rw
+        ports:
+            - "80:80"
+            - "443:443"
+    example_nodejs:
+        image: 'node:16.15.0-alpine3.15' # 'node:17.8.0-alpine3.14'
+        working_dir: /home/node/app
+        container_name: example_front
+        environment:
+            - VITE_API_KEY=CeciEstMaSuperClePrivee
+        command:
+            - /bin/sh
+            - '-c'
+            - 'yarn install && yarn dev'
+        volumes:
+            - '../:/home/node/app:rw'
+        ports:
+            - '3000:3000'
+    # Images optionnelles prêtes à l'emploi (...ou presque)
+    # mariadb:
+    #     image: 'mariadb:10.7.3'
+    #     container_name: db
+    #     volumes:
+    #         - 'db_data:/var/lib/mysql'
+    #     environment:
+    #         MYSQL_ROOT_PASSWORD: root
+    #         MYSQL_DATABASE: database
+    #         MYSQL_USER: username
+    #         MYSQL_PASSWORD: password
+    #     ports:
+    #         - '3306:3306'
+    # maildev:
+    #     image: maildev/maildev
+    #     container_name: maildev
+    #     ports:
+    #         - '1080:1080'
+    # rabbitmq:
+    #     image: 'rabbitmq:3.9.14-management'
+    #     container_name: rabbitmq
+    #     ports:
+    #         - '5672:5672'
+    #         - '15672:15672'
+    # redis:
+    #     restart: unless-stopped
+    #     image: 'redis:6.2.6-alpine'
+    # elasticsearch:
+    #     image: 'docker.elastic.co/elasticsearch/elasticsearch:7.12.0'
+    #     container_name: elasticsearch
+    #     environment:
+    #         - cluster.name=test_deploiement_continu-cluster
+    #         - bootstrap.memory_lock=true
+    #         - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+    #     ulimits:
+    #         memlock:
+    #             soft: -1
+    #             hard: -1
+    #     volumes:
+    #         - 'esdata1:/usr/share/elasticsearch/data'
+    #     ports:
+    #         - '9200:9200'
+    # kibana:
+    #     image: 'docker.elastic.co/kibana/kibana:7.12.0'
+    #     container_name: kibana
+    #     ports:
+    #         - '5601:5601'
+    #     depends_on:
+    #         - elasticsearch
+    # typesense:
+    #     restart: unless-stopped
+    #     image: 'typesense/typesense:0.22.2'
+    #     environment:
+    #         TYPESENSE_DATA_DIR: /data
+    #         TYPESENSE_API_KEY: typesensekey
+    #     volumes:
+    #         - 'search-data:/data'
+    #     ports:
+    #         - '8108:8108'
+    # volumes:
+    #     db_data:
+    #         driver: local
+    #     esdata1:
+    #         driver: local
+    #    search-data:
+    #        driver: local

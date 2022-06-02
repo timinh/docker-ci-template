@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+    # Image pour symfony 6
+    example_app:
+        build:
+            context: ../
+            dockerfile: docker/Dockerfile
+        image: example_app
+        environment:
+            TZ: Europe/Paris
+            APP_ENV: prod
+            DATABASE_URL: 'sqlite:///%kernel.project_dir%/var/data.db'
+        container_name: example_app
+        ports:
+            - "8081:80"
+            - "8043:443"
